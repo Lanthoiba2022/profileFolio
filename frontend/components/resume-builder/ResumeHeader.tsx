@@ -1,15 +1,20 @@
-'use client';
 import { ChevronDown, EditIcon, Share2, Check } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { pdf } from '@react-pdf/renderer';
+import { saveAs } from 'file-saver';
+import ResumePDF from './ResumePDF';
+import { useFormContext } from 'react-hook-form';
 
 interface HeaderProps {
   resumeName: string;
   setResumeName: (name: string) => void;
+  resumeData: any;
 }
 
-export default function ResumeHeader({ setResumeName, resumeName }: HeaderProps) {
+export default function ResumeHeader({ setResumeName, resumeName, resumeData }: HeaderProps) {
+  const { getValues } = useFormContext();
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(resumeName);
 
@@ -24,6 +29,15 @@ export default function ResumeHeader({ setResumeName, resumeName }: HeaderProps)
   const handleCheckClick = () => {
     setResumeName(inputValue);
     setIsEditing(false);
+  };
+
+  const handleDownload = async () => {
+    const resumeData = getValues();
+    const doc = <ResumePDF resumeData={resumeData} />;
+    const asPdf = pdf();
+    asPdf.updateContainer(doc);
+    const blob = await asPdf.toBlob();
+    saveAs(blob, `${resumeName}.pdf`);
   };
 
   return (
@@ -57,7 +71,7 @@ export default function ResumeHeader({ setResumeName, resumeName }: HeaderProps)
         <Button variant={'outline'} className="py-0 px-3">
           <Share2 size={15} />
         </Button>
-        <Button className="bg-green-500 text-white hover:bg-green-700">
+        <Button onClick={handleDownload} className="bg-green-500 text-white hover:bg-green-700 py-2 px-4 rounded flex items-center">
           Download
           <ChevronDown />
         </Button>

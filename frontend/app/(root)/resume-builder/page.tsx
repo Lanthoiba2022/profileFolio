@@ -11,6 +11,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 function PageContent() {
+  const methods = useForm();
   const searchParams = useSearchParams();
   const resumeId = searchParams?.get('resumeId');
   const { data: session } = useSession();
@@ -40,7 +41,6 @@ function PageContent() {
     }
   }, [user, currentResume, resumeId]);
 
-  const methods = useForm();
 
   useEffect(() => {
     if (currentResume) {
@@ -80,8 +80,9 @@ function PageContent() {
   };
 
   return (
+    <FormProvider {...methods}>
     <div className="h-full px-12">
-      <ResumeHeader resumeName={resumeName} setResumeName={setResumeName} />
+      <ResumeHeader resumeName={resumeName} setResumeName={setResumeName} resumeData={currentResume} />
       <hr />
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)} className="h-full">
@@ -92,6 +93,7 @@ function PageContent() {
         </form>
       </FormProvider>
     </div>
+    </FormProvider>
   );
 }
 
